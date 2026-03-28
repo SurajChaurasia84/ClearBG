@@ -1,6 +1,5 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../data/services/image_picker_service.dart';
@@ -74,79 +73,59 @@ class _HomeScreenState extends State<HomeScreen> {
     return AnimatedBuilder(
       animation: widget.controller,
       builder: (context, _) {
-        return Scaffold(
-          body: DecoratedBox(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: <Color>[AppTheme.start, AppTheme.end],
-              ),
-            ),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: CustomPaint(painter: _AmbientBackgroundPainter()),
-                  ),
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: const SystemUiOverlayStyle(
+            statusBarColor: Color(0x00000000),
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
+            systemNavigationBarColor: Color(0x00000000),
+            systemNavigationBarIconBrightness: Brightness.light,
+          ),
+          child: Scaffold(
+            body: DecoratedBox(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: <Color>[AppTheme.start, AppTheme.end],
                 ),
-                SafeArea(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1120),
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            GlassPanel(
-                              padding: const EdgeInsets.all(24),
-                              child: _buildHeader(context),
-                            ),
-                            const SizedBox(height: 18),
-                            GlassPanel(
-                              padding: const EdgeInsets.all(16),
-                              child: _buildPreviewArea(context),
-                            ),
-                            const SizedBox(height: 18),
-                            _buildActions(),
-                            const SizedBox(height: 18),
-                            GlassPanel(
-                              padding: const EdgeInsets.all(18),
-                              child: _buildBackgroundPicker(context),
-                            ),
-                          ],
-                        ),
-                      ),
+              ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: CustomPaint(painter: _AmbientBackgroundPainter()),
                     ),
                   ),
-                ),
-                if (widget.controller.isProcessing ||
-                    widget.controller.isSaving)
-                  Positioned.fill(
-                    child: ColoredBox(
-                      color: const Color(0x6608141F),
-                      child: Center(
-                        child: GlassPanel(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 28,
-                            vertical: 24,
+                  SafeArea(
+                    top: false,
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1120),
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.fromLTRB(
+                            20,
+                            MediaQuery.of(context).padding.top + 20,
+                            20,
+                            20,
                           ),
                           child: Column(
-                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              const SizedBox(
-                                width: 44,
-                                height: 44,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                ),
+                              GlassPanel(
+                                padding: const EdgeInsets.all(24),
+                                child: _buildHeader(context),
                               ),
-                              const SizedBox(height: 16),
-                              Text(
-                                widget.controller.isSaving
-                                    ? 'Saving your PNG...'
-                                    : 'Removing background offline...',
-                                style: Theme.of(context).textTheme.titleMedium,
+                              const SizedBox(height: 18),
+                              GlassPanel(
+                                padding: const EdgeInsets.all(16),
+                                child: _buildPreviewArea(context),
+                              ),
+                              const SizedBox(height: 18),
+                              _buildActions(),
+                              const SizedBox(height: 18),
+                              GlassPanel(
+                                padding: const EdgeInsets.all(18),
+                                child: _buildBackgroundPicker(context),
                               ),
                             ],
                           ),
@@ -154,7 +133,44 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-              ],
+                  if (widget.controller.isProcessing ||
+                      widget.controller.isSaving)
+                    Positioned.fill(
+                      child: ColoredBox(
+                        color: const Color(0x6608141F),
+                        child: Center(
+                          child: GlassPanel(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 24,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(
+                                  width: 44,
+                                  height: 44,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  widget.controller.isSaving
+                                      ? 'Saving your PNG...'
+                                      : 'Removing background offline...',
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         );
