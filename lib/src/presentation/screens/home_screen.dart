@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
         //     context,
         //   ).textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary),
         // ),
-        const SizedBox(height: 48),
+        const SizedBox(height: 28),
         Text(
           'Pick a photo and get a clean transparent cutout in seconds.',
           textAlign: TextAlign.center,
@@ -224,23 +224,27 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 1.3,
           ),
         ),
-        const SizedBox(height: 18),
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 12,
-          runSpacing: 12,
+        const SizedBox(height: 38),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            PrimaryActionButton(
-              icon: Icons.photo_library_outlined,
-              label: 'Pick From Gallery',
-              onPressed: () =>
-                  widget.controller.pickAndProcess(ClearBgImageSource.gallery),
+            Flexible(
+              child: PrimaryActionButton(
+                icon: Icons.photo_camera_outlined,
+                label: 'Use Camera',
+                onPressed: () =>
+                    widget.controller.pickAndProcess(ClearBgImageSource.camera),
+              ),
             ),
-            PrimaryActionButton(
-              icon: Icons.photo_camera_outlined,
-              label: 'Use Camera',
-              onPressed: () =>
-                  widget.controller.pickAndProcess(ClearBgImageSource.camera),
+            const SizedBox(width: 12),
+            Flexible(
+              child: PrimaryActionButton(
+                icon: Icons.photo_library_outlined,
+                label: 'Use Gallery',
+                onPressed: () => widget.controller.pickAndProcess(
+                  ClearBgImageSource.gallery,
+                ),
+              ),
             ),
           ],
         ),
