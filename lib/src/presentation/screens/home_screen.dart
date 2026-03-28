@@ -99,38 +99,62 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SafeArea(
                     top: false,
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 1120),
-                        child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Padding(
                           padding: EdgeInsets.fromLTRB(
                             20,
-                            MediaQuery.of(context).padding.top + 20,
+                            MediaQuery.of(context).padding.top + 12,
                             20,
-                            20,
+                            0,
                           ),
-                          child: Column(
-                            children: [
-                              GlassPanel(
-                                padding: const EdgeInsets.all(24),
-                                child: _buildHeader(context),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 1120),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 2,
+                                vertical: 10,
                               ),
-                              const SizedBox(height: 18),
-                              GlassPanel(
-                                padding: const EdgeInsets.all(16),
-                                child: _buildPreviewArea(context),
-                              ),
-                              const SizedBox(height: 18),
-                              _buildActions(),
-                              const SizedBox(height: 18),
-                              GlassPanel(
-                                padding: const EdgeInsets.all(18),
-                                child: _buildBackgroundPicker(context),
-                              ),
-                            ],
+                              child: _buildFixedAppBar(context),
+                            ),
                           ),
                         ),
-                      ),
+                        Expanded(
+                          child: Center(
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 1120),
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.fromLTRB(
+                                  20,
+                                  18,
+                                  20,
+                                  20,
+                                ),
+                                child: Column(
+                                  children: [
+                                    GlassPanel(
+                                      padding: const EdgeInsets.all(24),
+                                      child: _buildHeader(context),
+                                    ),
+                                    const SizedBox(height: 18),
+                                    GlassPanel(
+                                      padding: const EdgeInsets.all(16),
+                                      child: _buildPreviewArea(context),
+                                    ),
+                                    const SizedBox(height: 18),
+                                    _buildActions(),
+                                    const SizedBox(height: 18),
+                                    GlassPanel(
+                                      padding: const EdgeInsets.all(18),
+                                      child: _buildBackgroundPicker(context),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   if (widget.controller.isProcessing ||
@@ -182,19 +206,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         Text(
-          'ClearBG',
-          textAlign: TextAlign.center,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: 10),
-        Text(
           'Offline AI background removal with privacy-first ONNX processing.',
           textAlign: TextAlign.center,
           style: Theme.of(
             context,
           ).textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary),
+        ),
+        const SizedBox(height: 18),
+        Text(
+          'Pick a photo and get a clean transparent cutout in seconds.',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            height: 1.3,
+          ),
         ),
         const SizedBox(height: 18),
         Wrap(
@@ -215,6 +240,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   widget.controller.pickAndProcess(ClearBgImageSource.camera),
             ),
           ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFixedAppBar(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          'ClearBG',
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        const Spacer(),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          ),
+          child: Text(
+            'Offline AI',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppTheme.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       ],
     );
@@ -311,8 +365,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildActions() {
     final bool hasImage = widget.controller.hasResult;
 
-    return GlassPanel(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       child: Wrap(
         alignment: WrapAlignment.center,
         spacing: 12,
