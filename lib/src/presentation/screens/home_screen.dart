@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme/app_theme.dart';
@@ -22,8 +23,11 @@ class _HomeScreenState extends State<HomeScreen> {
     Color(0xFFFFFFFF),
     Color(0xFFF8E9D2),
     Color(0xFFDFF7F5),
+    Color(0xFF419CD5),
     Color(0xFF111827),
     Color(0xFFFFD6E7),
+    Color(0xFFFFF1A8),
+    Color(0xFFCDEB8B),
   ];
 
   @override
@@ -185,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Text(
                                   widget.controller.isSaving
                                       ? 'Saving your PNG...'
-                                      : 'Removing background offline...',
+                                      : 'Removing background...',
                                   style: Theme.of(
                                     context,
                                   ).textTheme.titleMedium,
@@ -389,7 +393,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
               },
               icon: const Icon(Icons.download_rounded),
-              label: const Text('Save PNG'),
+              label: const Text('Download'),
             ),
           ],
         ),
@@ -426,6 +430,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBackgroundPicker(BuildContext context) {
     final bool hasImage = widget.controller.hasResult;
+    final List<Widget> swatches = [
+      _ColorSwatchButton(
+        label: 'None',
+        isSelected: widget.controller.selectedBackgroundColor == null,
+        onTap: hasImage
+            ? () => widget.controller.selectBackgroundColor(null)
+            : null,
+      ),
+      for (final color in _backgroundOptions)
+        _ColorSwatchButton(
+          color: color,
+          isSelected: widget.controller.selectedBackgroundColor == color,
+          onTap: hasImage
+              ? () => widget.controller.selectBackgroundColor(color)
+              : null,
+        ),
+      _ColorSwatchButton(
+        icon: Icons.colorize_rounded,
+        isGradientPreview: true,
+        isSelected:
+            hasImage &&
+            widget.controller.selectedBackgroundColor != null &&
+            !_backgroundOptions.contains(
+              widget.controller.selectedBackgroundColor,
+            ),
+        onTap: hasImage ? () => _showCustomColorPicker(context) : null,
+      ),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -444,28 +476,60 @@ class _HomeScreenState extends State<HomeScreen> {
           ).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
         ),
         const SizedBox(height: 14),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            _ColorSwatchButton(
-              label: 'None',
-              isSelected: widget.controller.selectedBackgroundColor == null,
-              onTap: hasImage
-                  ? () => widget.controller.selectBackgroundColor(null)
-                  : null,
-            ),
-            for (final color in _backgroundOptions)
-              _ColorSwatchButton(
-                color: color,
-                isSelected: widget.controller.selectedBackgroundColor == color,
-                onTap: hasImage
-                    ? () => widget.controller.selectBackgroundColor(color)
-                    : null,
-              ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            const spacing = 12.0;
+            final itemWidth = (constraints.maxWidth - (spacing * 3)) / 4;
+
+            return Wrap(
+              spacing: spacing,
+              runSpacing: spacing,
+              children: [
+                for (final swatch in swatches)
+                  SizedBox(width: itemWidth, child: swatch),
+              ],
+            );
+          },
         ),
       ],
+    );
+  }
+
+  Future<void> _showCustomColorPicker(BuildContext context) async {
+    Color pickerColor =
+        widget.controller.selectedBackgroundColor ?? const Color(0xFF419CD5);
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF101A28),
+          title: const Text('Pick Background Color'),
+          content: SingleChildScrollView(
+            child: ColorPicker(
+              pickerColor: pickerColor,
+              onColorChanged: (color) => pickerColor = color,
+              enableAlpha: false,
+              labelTypes: const [],
+              portraitOnly: true,
+              pickerAreaHeightPercent: 0.75,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                widget.controller.selectBackgroundColor(pickerColor);
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Apply'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -561,16 +625,21 @@ class _ColorSwatchButton extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     this.label,
+    this.icon,
+    this.isGradientPreview = false,
   });
 
   final Color? color;
   final bool isSelected;
   final VoidCallback? onTap;
   final String? label;
+  final IconData? icon;
+  final bool isGradientPreview;
 
   @override
   Widget build(BuildContext context) {
     final bool useDarkIcon = color == null || color!.computeLuminance() > 0.6;
+    final Color fallbackColor = color ?? Colors.white.withValues(alpha: 0.08);
 
     return GestureDetector(
       onTap: onTap,
@@ -579,7 +648,20 @@ class _ColorSwatchButton extends StatelessWidget {
         width: 70,
         height: 70,
         decoration: BoxDecoration(
-          color: color ?? Colors.white.withValues(alpha: 0.08),
+          gradient: isGradientPreview
+              ? const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFFF8A65),
+                    Color(0xFFFDE68A),
+                    Color(0xFF67E8F9),
+                    Color(0xFF60A5FA),
+                    Color(0xFFC084FC),
+                  ],
+                )
+              : null,
+          color: isGradientPreview ? null : fallbackColor,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
             width: isSelected ? 3 : 1,
@@ -597,8 +679,12 @@ class _ColorSwatchButton extends StatelessWidget {
                   ),
                 )
               : Icon(
-                  isSelected ? Icons.check_rounded : Icons.palette_outlined,
-                  color: useDarkIcon ? Colors.black87 : Colors.white,
+                  isSelected
+                      ? Icons.check_rounded
+                      : (icon ?? Icons.palette_outlined),
+                  color: isGradientPreview
+                      ? Colors.white
+                      : (useDarkIcon ? Colors.black87 : Colors.white),
                 ),
         ),
       ),
