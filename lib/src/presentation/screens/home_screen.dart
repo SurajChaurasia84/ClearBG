@@ -132,8 +132,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 child: Column(
                                   children: [
-                                    GlassPanel(
-                                      padding: const EdgeInsets.all(24),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 8,
+                                      ),
                                       child: _buildHeader(context),
                                     ),
                                     const SizedBox(height: 18),
@@ -205,14 +208,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHeader(BuildContext context) {
     return Column(
       children: [
-        Text(
-          'Offline AI background removal with privacy-first ONNX processing.',
-          textAlign: TextAlign.center,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary),
-        ),
-        const SizedBox(height: 18),
+        // Text(
+        //   'Offline AI background removal with privacy-first ONNX processing.',
+        //   textAlign: TextAlign.center,
+        //   style: Theme.of(
+        //     context,
+        //   ).textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary),
+        // ),
+        const SizedBox(height: 48),
         Text(
           'Pick a photo and get a clean transparent cutout in seconds.',
           textAlign: TextAlign.center,
