@@ -216,12 +216,28 @@ class _HomeScreenState extends State<HomeScreen> {
         //   ).textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary),
         // ),
         const SizedBox(height: 28),
-        Text(
-          'Pick a photo and get a clean transparent cutout in seconds.',
+        RichText(
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w700,
-            height: 1.3,
+          text: TextSpan(
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              height: 1.3,
+            ),
+            children: [
+              const TextSpan(text: 'Pick a photo and get a clean '),
+              WidgetSpan(
+                alignment: PlaceholderAlignment.baseline,
+                baseline: TextBaseline.alphabetic,
+                child: GradientText(
+                  'Transparent',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+              const TextSpan(text: ' cutout in seconds.'),
+            ],
           ),
         ),
         const SizedBox(height: 38),
@@ -630,4 +646,24 @@ class _AmbientBackgroundPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class GradientText extends StatelessWidget {
+  const GradientText(this.text, {required this.style, super.key});
+
+  final String text;
+  final TextStyle? style;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      blendMode: BlendMode.srcIn,
+      shaderCallback: (bounds) {
+        return const LinearGradient(
+          colors: [Color(0xFF60A5FA), Color(0xFF67E8F9)],
+        ).createShader(bounds);
+      },
+      child: Text(text, style: style),
+    );
+  }
 }
