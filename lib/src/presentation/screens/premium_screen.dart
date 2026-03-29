@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../widgets/glass_panel.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -12,7 +11,7 @@ class PremiumScreen extends StatefulWidget {
 }
 
 class _PremiumScreenState extends State<PremiumScreen> {
-  bool _isYearly = true;
+  bool _isYearly = false;
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +63,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
                             ],
                           ),
                           const SizedBox(height: 24),
-                          GlassPanel(
-                            padding: const EdgeInsets.all(24),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 4,
+                            ),
                             child: Column(
                               children: [
                                 Container(
@@ -90,7 +92,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                 ),
                                 const SizedBox(height: 18),
                                 Text(
-                                  'Go Premium and remove backgrounds without limits.',
+                                  'Go Premium & remove backgrounds without limits.',
                                   textAlign: TextAlign.center,
                                   style: Theme.of(context)
                                       .textTheme
@@ -101,18 +103,21 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                       ),
                                 ),
                                 const SizedBox(height: 10),
-                                Text(
-                                  'Choose a plan that fits your workflow and get the best export experience for creators, sellers, and everyday edits.',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.bodyLarge
-                                      ?.copyWith(color: AppTheme.textSecondary),
-                                ),
+                                // Text(
+                                //   'Choose a plan that fits your workflow and get the best export experience for creators, sellers, and everyday edits.',
+                                //   textAlign: TextAlign.center,
+                                //   style: Theme.of(context).textTheme.bodyLarge
+                                //       ?.copyWith(color: AppTheme.textSecondary),
+                                // ),
                               ],
                             ),
                           ),
                           const SizedBox(height: 18),
-                          GlassPanel(
-                            padding: const EdgeInsets.all(20),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 4,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -135,24 +140,32 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                   builder: (context, constraints) {
                                     final wide = constraints.maxWidth >= 760;
                                     final monthlyCard = _PlanCard(
-                                      title: 'Monthly',
-                                      price: '\$4.99',
+                                      price: '\u20B949',
                                       period: '/month',
                                       description:
                                           'Best for trying premium tools without a long commitment.',
                                       isActive: !_isYearly,
                                       badgeText: 'Flexible',
                                       accent: const Color(0xFF67E8F9),
+                                      onTap: () {
+                                        setState(() {
+                                          _isYearly = false;
+                                        });
+                                      },
                                     );
                                     final yearlyCard = _PlanCard(
-                                      title: 'Yearly',
-                                      price: '\$29.99',
+                                      price: '\u20B9499',
                                       period: '/year',
                                       description:
                                           'Best value for frequent edits with lower per-month cost.',
                                       isActive: _isYearly,
-                                      badgeText: 'Save 50%',
-                                      accent: const Color(0xFF60A5FA),
+                                      badgeText: 'Save 15%',
+                                      accent: const Color(0xFF67E8F9),
+                                      onTap: () {
+                                        setState(() {
+                                          _isYearly = true;
+                                        });
+                                      },
                                     );
 
                                     if (!wide) {
@@ -201,8 +214,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
                             ),
                           ),
                           const SizedBox(height: 18),
-                          GlassPanel(
-                            padding: const EdgeInsets.all(20),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 4,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -220,10 +236,10 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                 ),
                                 const SizedBox(height: 12),
                                 const _BenefitRow(
-                                  title: 'Faster exports',
+                                  title: 'No ads',
                                   subtitle:
-                                      'Prioritized processing feel with cleaner workflow and fewer interruptions.',
-                                  icon: Icons.flash_on_rounded,
+                                      'Enjoy a distraction-free editing experience without ads.',
+                                  icon: Icons.block_rounded,
                                 ),
                                 const SizedBox(height: 12),
                                 const _BenefitRow(
@@ -271,24 +287,50 @@ class _BillingToggle extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _TogglePill(
-              label: 'Monthly',
-              isActive: !isYearly,
-              onTap: () => onChanged(false),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _TogglePill(
-              label: 'Yearly',
-              isActive: isYearly,
-              onTap: () => onChanged(true),
-            ),
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final pillWidth = (constraints.maxWidth - 8) / 2;
+
+          return Stack(
+            children: [
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                left: isYearly ? pillWidth + 8 : 0,
+                top: 0,
+                child: Container(
+                  width: pillWidth,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF67E8F9), Color(0xFF60A5FA)],
+                    ),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: _TogglePill(
+                      label: 'Monthly',
+                      isActive: !isYearly,
+                      onTap: () => onChanged(false),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _TogglePill(
+                      label: 'Yearly',
+                      isActive: isYearly,
+                      onTap: () => onChanged(true),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -308,26 +350,19 @@ class _TogglePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          gradient: isActive
-              ? const LinearGradient(
-                  colors: [Color(0xFF67E8F9), Color(0xFF60A5FA)],
-                )
-              : null,
-          color: isActive ? null : Colors.transparent,
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: isActive ? const Color(0xFF0F172A) : Colors.white,
-            fontWeight: FontWeight.w700,
+      child: SizedBox(
+        height: 52,
+        child: Center(
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+              color: isActive ? const Color(0xFF0F172A) : Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+            child: Text(label),
           ),
         ),
       ),
@@ -337,102 +372,111 @@ class _TogglePill extends StatelessWidget {
 
 class _PlanCard extends StatelessWidget {
   const _PlanCard({
-    required this.title,
     required this.price,
     required this.period,
     required this.description,
     required this.isActive,
     required this.badgeText,
     required this.accent,
+    required this.onTap,
   });
 
-  final String title;
   final String price;
   final String period;
   final String description;
   final bool isActive;
   final String badgeText;
   final Color accent;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOutCubic,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: isActive
-            ? LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  accent.withValues(alpha: 0.40),
-                  Colors.white.withValues(alpha: 0.10),
-                ],
-              )
-            : null,
-        color: isActive ? null : Colors.white.withValues(alpha: 0.06),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(
-          color: isActive
-              ? accent.withValues(alpha: 0.85)
-              : Colors.white.withValues(alpha: 0.12),
-          width: isActive ? 2 : 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(999),
+        splashColor: accent.withValues(alpha: 0.18),
+        highlightColor: accent.withValues(alpha: 0.08),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            gradient: isActive
+                ? LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      accent.withValues(alpha: 0.40),
+                      Colors.white.withValues(alpha: 0.10),
+                    ],
+                  )
+                : null,
+            color: isActive ? null : Colors.white.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(
+              color: isActive
+                  ? accent.withValues(alpha: 0.85)
+                  : Colors.white.withValues(alpha: 0.12),
+              width: isActive ? 2 : 1,
             ),
-            child: Text(
-              badgeText,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppTheme.textSecondary,
-                fontWeight: FontWeight.w700,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        children: [
+                          TextSpan(
+                            text: price,
+                            style: Theme.of(context).textTheme.headlineMedium
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          TextSpan(
+                            text: period,
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(color: AppTheme.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      badgeText,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textSecondary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 10),
-          RichText(
-            text: TextSpan(
-              style: Theme.of(context).textTheme.bodyLarge,
-              children: [
-                TextSpan(
-                  text: price,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              const SizedBox(height: 12),
+              Text(
+                description,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.textSecondary,
+                  height: 1.4,
                 ),
-                TextSpan(
-                  text: period,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            description,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.textSecondary,
-              height: 1.4,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
