@@ -102,13 +102,6 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                         height: 1.2,
                                       ),
                                 ),
-                                const SizedBox(height: 10),
-                                // Text(
-                                //   'Choose a plan that fits your workflow and get the best export experience for creators, sellers, and everyday edits.',
-                                //   textAlign: TextAlign.center,
-                                //   style: Theme.of(context).textTheme.bodyLarge
-                                //       ?.copyWith(color: AppTheme.textSecondary),
-                                // ),
                               ],
                             ),
                           ),
@@ -123,8 +116,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
                               children: [
                                 Text(
                                   'Choose Your Plan',
-                                  style: Theme.of(context).textTheme.titleLarge
-                                      ?.copyWith(fontWeight: FontWeight.w700),
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        color: const Color.fromARGB(255, 210, 219, 231),
+                                      ),
                                 ),
                                 const SizedBox(height: 14),
                                 _BillingToggle(
