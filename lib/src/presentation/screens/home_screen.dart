@@ -366,36 +366,20 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: SliderTheme(
-                data: SliderTheme.of(context).copyWith(
-                  activeTrackColor: Colors.white,
-                  inactiveTrackColor: Colors.white.withValues(alpha: 0.18),
-                  thumbColor: Colors.white,
-                  overlayColor: Colors.white.withValues(alpha: 0.12),
-                ),
-                child: Slider(
-                  value: widget.controller.comparePosition,
-                  onChanged: widget.controller.updateComparePosition,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            FilledButton.icon(
-              onPressed: () async {
-                final messenger = ScaffoldMessenger.of(context);
-                final savedMessage = await widget.controller.saveCurrentImage();
-                if (!mounted || savedMessage == null) {
-                  return;
-                }
-                messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
-              },
-              icon: const Icon(Icons.download_rounded),
-              label: const Text('Download'),
-            ),
-          ],
+        Align(
+          alignment: Alignment.centerRight,
+          child: FilledButton.icon(
+            onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              final savedMessage = await widget.controller.saveCurrentImage();
+              if (!mounted || savedMessage == null) {
+                return;
+              }
+              messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
+            },
+            icon: const Icon(Icons.download_rounded),
+            label: const Text('Download'),
+          ),
         ),
       ],
     );
