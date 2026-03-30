@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -11,13 +13,43 @@ class BottomBannerAd extends StatefulWidget {
 }
 
 class _BottomBannerAdState extends State<BottomBannerAd> {
+  static const Duration _refreshInterval = Duration(seconds: 90);
+
   BannerAd? _bannerAd;
   bool _isLoaded = false;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _startBannerCycle();
+    });
+  }
+
+  void _startBannerCycle() {
     _loadBanner();
+    _refreshTimer ??= Timer.periodic(_refreshInterval, (_) {
+      _refreshBanner();
+    });
+  }
+
+  Future<void> _refreshBanner() async {
+    _bannerAd?.dispose();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _bannerAd = null;
+      _isLoaded = false;
+    });
+
+    await _loadBanner();
   }
 
   Future<void> _loadBanner() async {
@@ -60,6 +92,7 @@ class _BottomBannerAdState extends State<BottomBannerAd> {
 
   @override
   void dispose() {
+    _refreshTimer?.cancel();
     _bannerAd?.dispose();
     super.dispose();
   }

@@ -207,6 +207,23 @@ class ClearBgController extends ChangeNotifier {
     }
   }
 
+  Future<void> warmUpEngine() async {
+    if (_backgroundService.isInitialized) {
+      return;
+    }
+
+    try {
+      await _backgroundService.initialize();
+      if (_engineError != null) {
+        _engineError = null;
+        notifyListeners();
+      }
+    } catch (error) {
+      _engineError = _friendlyMessage(error);
+      notifyListeners();
+    }
+  }
+
   Future<void> _ensureInitialized() async {
     if (_backgroundService.isInitialized) {
       return;

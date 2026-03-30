@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   late final AnimationController _watchAdPulseController;
   late final Animation<double> _watchAdScaleAnimation;
+  bool _showDeferredUi = false;
 
   @override
   void initState() {
@@ -47,6 +48,14 @@ class _HomeScreenState extends State<HomeScreen>
       CurvedAnimation(parent: _watchAdPulseController, curve: Curves.easeInOut),
     );
     widget.controller.addListener(_handleControllerUpdate);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _showDeferredUi = true;
+      });
+    });
   }
 
   @override
@@ -100,7 +109,9 @@ class _HomeScreenState extends State<HomeScreen>
             systemNavigationBarIconBrightness: Brightness.light,
           ),
           child: Scaffold(
-            bottomNavigationBar: const BottomBannerAd(),
+            bottomNavigationBar: _showDeferredUi
+                ? const BottomBannerAd()
+                : null,
             body: DecoratedBox(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -111,11 +122,14 @@ class _HomeScreenState extends State<HomeScreen>
               ),
               child: Stack(
                 children: [
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: CustomPaint(painter: _AmbientBackgroundPainter()),
+                  if (_showDeferredUi)
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: CustomPaint(
+                          painter: _AmbientBackgroundPainter(),
+                        ),
+                      ),
                     ),
-                  ),
                   SafeArea(
                     top: false,
                     child: Column(
