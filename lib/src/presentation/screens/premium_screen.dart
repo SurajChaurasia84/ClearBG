@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../widgets/bottom_banner_ad.dart';
 
 class PremiumScreen extends StatefulWidget {
   const PremiumScreen({super.key});
@@ -24,6 +25,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
         systemNavigationBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
+        bottomNavigationBar: const BottomBannerAd(),
         body: DecoratedBox(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -119,7 +121,12 @@ class _PremiumScreenState extends State<PremiumScreen> {
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(
                                         fontWeight: FontWeight.w700,
-                                        color: const Color.fromARGB(255, 210, 219, 231),
+                                        color: const Color.fromARGB(
+                                          255,
+                                          210,
+                                          219,
+                                          231,
+                                        ),
                                       ),
                                 ),
                                 const SizedBox(height: 14),

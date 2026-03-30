@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../data/services/image_picker_service.dart';
 import '../controllers/clearbg_controller.dart';
 import 'premium_screen.dart';
+import '../widgets/bottom_banner_ad.dart';
 import '../widgets/glass_panel.dart';
 import '../widgets/preview_compare_slider.dart';
 import '../widgets/primary_action_button.dart';
@@ -87,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
             systemNavigationBarIconBrightness: Brightness.light,
           ),
           child: Scaffold(
+            bottomNavigationBar: const BottomBannerAd(),
             body: DecoratedBox(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
