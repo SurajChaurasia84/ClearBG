@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import 'src/app.dart';
+import 'src/core/ads/rewarded_ad_service.dart';
 import 'src/data/services/background_removal_service.dart';
 import 'src/data/services/image_picker_service.dart';
 import 'src/data/services/image_save_service.dart';
@@ -38,6 +39,7 @@ Future<void> main() async {
     backgroundService: backgroundRemovalService,
     imagePickerService: ImagePickerService(),
     imageSaveService: ImageSaveService(),
+    rewardedAdService: RewardedAdService(),
     startupError: startupError,
   );
 

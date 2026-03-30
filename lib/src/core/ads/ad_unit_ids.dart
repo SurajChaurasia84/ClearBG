@@ -15,6 +15,19 @@ class AdUnitIds {
     }
   }
 
+  static String get rewarded {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'ca-app-pub-3940256099942544/5224354917';
+      case TargetPlatform.iOS:
+        return 'ca-app-pub-3940256099942544/1712485313';
+      default:
+        throw UnsupportedError(
+          'Rewarded ads are only supported on Android and iOS.',
+        );
+    }
+  }
+
   static bool get isSupported =>
       !kIsWeb &&
       (defaultTargetPlatform == TargetPlatform.android ||

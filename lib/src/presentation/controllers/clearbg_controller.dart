@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import '../../core/ads/rewarded_ad_service.dart';
 import '../../data/services/background_removal_service.dart';
 import '../../data/services/image_picker_service.dart';
 import '../../data/services/image_save_service.dart';
@@ -12,15 +13,18 @@ class ClearBgController extends ChangeNotifier {
     required BackgroundRemovalService backgroundService,
     required ImagePickerService imagePickerService,
     required ImageSaveService imageSaveService,
+    required RewardedAdService rewardedAdService,
     String? startupError,
   }) : _backgroundService = backgroundService,
        _imagePickerService = imagePickerService,
        _imageSaveService = imageSaveService,
+       _rewardedAdService = rewardedAdService,
        _engineError = startupError;
 
   final BackgroundRemovalService _backgroundService;
   final ImagePickerService _imagePickerService;
   final ImageSaveService _imageSaveService;
+  final RewardedAdService _rewardedAdService;
 
   Uint8List? _originalBytes;
   Uint8List? _transparentBytes;
@@ -30,6 +34,7 @@ class ClearBgController extends ChangeNotifier {
   String? _engineError;
   bool _isProcessing = false;
   bool _isSaving = false;
+  String _busyMessage = 'Saving your image...';
   double _comparePosition = 0.5;
   Color? _selectedBackgroundColor;
   ClearBgImageSource? _lastSource;
@@ -44,6 +49,7 @@ class ClearBgController extends ChangeNotifier {
   double get comparePosition => _comparePosition;
   Color? get selectedBackgroundColor => _selectedBackgroundColor;
   bool get isReady => _backgroundService.isInitialized && _engineError == null;
+  String get busyMessage => _busyMessage;
 
   Future<void> pickAndProcess(ClearBgImageSource source) async {
     _errorMessage = null;
@@ -122,10 +128,50 @@ class ClearBgController extends ChangeNotifier {
     }
 
     _isSaving = true;
+    _busyMessage = 'Saving with watermark...';
     _errorMessage = null;
     notifyListeners();
 
     try {
+      final bytes = await _backgroundService.addWatermark(imageBytes: preview);
+      return await _imageSaveService.savePng(
+        bytes,
+        fileName: _buildFileName(isWatermarked: true),
+      );
+    } catch (error) {
+      _errorMessage = _friendlyMessage(error);
+      return null;
+    } finally {
+      _isSaving = false;
+      _busyMessage = 'Saving your image...';
+      notifyListeners();
+    }
+  }
+
+  Future<String?> watchAdAndSaveWithoutWatermark() async {
+    final preview = _previewBytes;
+    if (preview == null) {
+      _errorMessage = 'Pick an image first so there is something to save.';
+      notifyListeners();
+      return null;
+    }
+
+    _isSaving = true;
+    _busyMessage = 'Loading rewarded ad...';
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final earnedReward = await _rewardedAdService.showRewardedSaveAd();
+      if (!earnedReward) {
+        _errorMessage =
+            'Ad was not completed, so the clean save was cancelled.';
+        return null;
+      }
+
+      _busyMessage = 'Saving without watermark...';
+      notifyListeners();
+
       return await _imageSaveService.savePng(
         preview,
         fileName: _buildFileName(),
@@ -135,6 +181,7 @@ class ClearBgController extends ChangeNotifier {
       return null;
     } finally {
       _isSaving = false;
+      _busyMessage = 'Saving your image...';
       notifyListeners();
     }
   }
@@ -174,14 +221,15 @@ class ClearBgController extends ChangeNotifier {
     }
   }
 
-  String _buildFileName() {
+  String _buildFileName({bool isWatermarked = false}) {
     final String rawName = _imageName ?? 'clearbg_image';
     final String sanitizedName = rawName.replaceAll(RegExp(r'\.[^.]+$'), '');
     final String suffix = _selectedBackgroundColor == null
         ? 'transparent'
         : 'colorized';
+    final String watermarkSuffix = isWatermarked ? 'watermarked' : 'clean';
     final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    return '${sanitizedName}_${suffix}_$timestamp.png';
+    return '${sanitizedName}_${suffix}_${watermarkSuffix}_$timestamp.png';
   }
 
   String _friendlyMessage(Object error) {

@@ -93,6 +93,72 @@ class BackgroundRemovalService {
     }
   }
 
+  Future<Uint8List> addWatermark({
+    required Uint8List imageBytes,
+    String text = 'ClearBG',
+  }) async {
+    final ui.Codec codec = await ui.instantiateImageCodec(imageBytes);
+    final ui.FrameInfo frame = await codec.getNextFrame();
+    final ui.Image baseImage = frame.image;
+
+    try {
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+      final size = Size(
+        baseImage.width.toDouble(),
+        baseImage.height.toDouble(),
+      );
+
+      canvas.drawImage(baseImage, Offset.zero, Paint());
+
+      final double fontSize = (size.shortestSide * 0.055).clamp(18.0, 34.0);
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: text,
+          style: TextStyle(
+            color: const Color(0xEFFFFFFF),
+            fontSize: fontSize,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.2,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      final double horizontalPadding = fontSize * 0.55;
+      final double verticalPadding = fontSize * 0.34;
+      final double margin = fontSize * 0.8;
+      final Offset textOffset = Offset(
+        size.width - textPainter.width - horizontalPadding - margin,
+        size.height - textPainter.height - verticalPadding - margin,
+      );
+
+      textPainter.paint(canvas, textOffset);
+
+      final ui.Image watermarkedImage = await recorder.endRecording().toImage(
+        baseImage.width,
+        baseImage.height,
+      );
+
+      try {
+        final ByteData? byteData = await watermarkedImage.toByteData(
+          format: ui.ImageByteFormat.png,
+        );
+
+        if (byteData == null) {
+          throw StateError('Unable to add the watermark to this image.');
+        }
+
+        return byteData.buffer.asUint8List();
+      } finally {
+        watermarkedImage.dispose();
+      }
+    } finally {
+      baseImage.dispose();
+      codec.dispose();
+    }
+  }
+
   Future<void> dispose() async {
     if (!_isInitialized) {
       return;

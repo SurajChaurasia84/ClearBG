@@ -191,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const SizedBox(height: 16),
                                 Text(
                                   widget.controller.isSaving
-                                      ? 'Saving your PNG...'
+                                      ? widget.controller.busyMessage
                                       : 'Removing background...',
                                   style: Theme.of(
                                     context,
@@ -405,20 +405,37 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        Align(
-          alignment: Alignment.centerRight,
-          child: FilledButton.icon(
-            onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              final savedMessage = await widget.controller.saveCurrentImage();
-              if (!mounted || savedMessage == null) {
-                return;
-              }
-              messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
-            },
-            icon: const Icon(Icons.download_rounded),
-            label: const Text('Download'),
-          ),
+        Wrap(
+          alignment: WrapAlignment.end,
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            FilledButton.icon(
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final savedMessage = await widget.controller.saveCurrentImage();
+                if (!mounted || savedMessage == null) {
+                  return;
+                }
+                messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
+              },
+              icon: const Icon(Icons.download_rounded),
+              label: const Text('Download'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final savedMessage = await widget.controller
+                    .watchAdAndSaveWithoutWatermark();
+                if (!mounted || savedMessage == null) {
+                  return;
+                }
+                messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
+              },
+              icon: const Icon(Icons.ondemand_video_rounded),
+              label: const Text('Watch Ad'),
+            ),
+          ],
         ),
       ],
     );
