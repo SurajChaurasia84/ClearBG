@@ -405,37 +405,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        Wrap(
-          alignment: WrapAlignment.end,
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            FilledButton.icon(
-              onPressed: () async {
-                final messenger = ScaffoldMessenger.of(context);
-                final savedMessage = await widget.controller.saveCurrentImage();
-                if (!mounted || savedMessage == null) {
-                  return;
-                }
-                messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
-              },
-              icon: const Icon(Icons.download_rounded),
-              label: const Text('Download'),
-            ),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final messenger = ScaffoldMessenger.of(context);
-                final savedMessage = await widget.controller
-                    .watchAdAndSaveWithoutWatermark();
-                if (!mounted || savedMessage == null) {
-                  return;
-                }
-                messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
-              },
-              icon: const Icon(Icons.ondemand_video_rounded),
-              label: const Text('Watch Ad'),
-            ),
-          ],
+        Align(
+          alignment: Alignment.center,
+          child: FilledButton.icon(
+            onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              final savedMessage = await widget.controller
+                  .watchAdAndSaveWithoutWatermark();
+              if (!mounted || savedMessage == null) {
+                return;
+              }
+              messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
+            },
+            icon: const Icon(Icons.ondemand_video_rounded),
+            label: const Text('Watch Ad to Remove Watermark'),
+          ),
         ),
       ],
     );
@@ -456,12 +440,22 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.refresh_rounded),
             label: const Text('Retry'),
           ),
-          OutlinedButton.icon(
+          FilledButton.icon(
             onPressed: hasImage
-                ? () => widget.controller.selectBackgroundColor(null)
+                ? () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    final savedMessage = await widget.controller
+                        .saveCurrentImage();
+                    if (!mounted || savedMessage == null) {
+                      return;
+                    }
+                    messenger.showSnackBar(
+                      SnackBar(content: Text(savedMessage)),
+                    );
+                  }
                 : null,
-            icon: const Icon(Icons.layers_clear_outlined),
-            label: const Text('Transparent'),
+            icon: const Icon(Icons.download_rounded),
+            label: const Text('Download'),
           ),
         ],
       ),
