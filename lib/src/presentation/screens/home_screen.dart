@@ -390,16 +390,15 @@ class _HomeScreenState extends State<HomeScreen>
       children: [
         Row(
           children: [
-            _LabelChip(
-              label: 'Before',
-              color: Colors.white.withValues(alpha: 0.16),
-            ),
             const Spacer(),
-            _LabelChip(
-              label: widget.controller.selectedBackgroundColor == null
+            Text(
+              widget.controller.selectedBackgroundColor == null
                   ? 'After • Transparent PNG'
                   : 'After • Color Preview',
-              color: const Color(0x401BCEDF),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -643,29 +642,6 @@ class _StatusState extends StatelessWidget {
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _LabelChip extends StatelessWidget {
-  const _LabelChip({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-        ),
-        child: Text(label),
       ),
     );
   }
