@@ -20,7 +20,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   static const List<Color> _backgroundOptions = <Color>[
     Color(0xFFFFFFFF),
     Color(0xFFF8E9D2),
@@ -32,14 +33,25 @@ class _HomeScreenState extends State<HomeScreen> {
     Color(0xFFCDEB8B),
   ];
 
+  late final AnimationController _watchAdPulseController;
+  late final Animation<double> _watchAdScaleAnimation;
+
   @override
   void initState() {
     super.initState();
+    _watchAdPulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1100),
+    )..repeat(reverse: true);
+    _watchAdScaleAnimation = Tween<double>(begin: 1, end: 1.04).animate(
+      CurvedAnimation(parent: _watchAdPulseController, curve: Curves.easeInOut),
+    );
     widget.controller.addListener(_handleControllerUpdate);
   }
 
   @override
   void dispose() {
+    _watchAdPulseController.dispose();
     widget.controller.removeListener(_handleControllerUpdate);
     widget.controller.dispose();
     super.dispose();
@@ -407,18 +419,21 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 16),
         Align(
           alignment: Alignment.center,
-          child: FilledButton.icon(
-            onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              final savedMessage = await widget.controller
-                  .watchAdAndSaveWithoutWatermark();
-              if (!mounted || savedMessage == null) {
-                return;
-              }
-              messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
-            },
-            icon: const Icon(Icons.ondemand_video_rounded),
-            label: const Text('Watch Ad to Remove Watermark'),
+          child: ScaleTransition(
+            scale: _watchAdScaleAnimation,
+            child: FilledButton.icon(
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final savedMessage = await widget.controller
+                    .watchAdAndSaveWithoutWatermark();
+                if (!mounted || savedMessage == null) {
+                  return;
+                }
+                messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
+              },
+              icon: const Icon(Icons.ondemand_video_rounded),
+              label: const Text('Watch Ad to Remove Watermark'),
+            ),
           ),
         ),
       ],
